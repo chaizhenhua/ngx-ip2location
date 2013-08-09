@@ -1,0 +1,65 @@
+
+worker_processes  1;
+
+error_log  logs/error.log debug;
+
+working_directory /usr/local/nginx;
+
+events {
+    worker_connections  1024;
+}
+
+http {
+    include       mime.types;
+    default_type  application/octet-stream;
+
+    ip2location on;
+    ip2location_database /usr/local/nginx/conf/IP-COUNTRY-SAMPLE.BIN;
+    ip2location_access_type shared_memory;
+
+    server {
+        listen       80;
+
+        # pass the PHP scripts to FastCGI server listening on 127.0.0.1:9000
+        #
+        location ~ \.php$ {
+            fastcgi_split_path_info ^(.+\.php)(/.+)$;
+            # NOTE: You should have "cgi.fix_pathinfo = 0;" in php.ini
+    
+            # With php5-cgi alone:
+            fastcgi_pass 127.0.0.1:9000;
+            # With php5-fpm:
+            # fastcgi_pass unix:/var/run/php5-fpm.sock;
+            fastcgi_index index.php;
+            include fastcgi_params;
+            fastcgi_param SCRIPT_FILENAME $document_root/$fastcgi_script_name;
+
+            # pass ip2location variable to PHP
+            fastcgi_param COUNTRY_SHORT       $ip2location_country_short;
+            fastcgi_param COUNTRY_LONG        $ip2location_country_long;
+            fastcgi_param REGION              $ip2location_region;
+            fastcgi_param CITY                $ip2location_city;
+            fastcgi_param ISP                 $ip2location_isp;
+            fastcgi_param LATITUDE            $ip2location_latitude;
+            fastcgi_param ISP                 $ip2location_longitude;
+            fastcgi_param DOMAIN              $ip2location_domain;
+            fastcgi_param ZIPCODE             $ip2location_zipcode;
+            fastcgi_param TIMEZONE            $ip2location_timezone;
+            fastcgi_param NETSPEED            $ip2location_netspeed;
+            fastcgi_param IDDCODE             $ip2location_iddcode;
+            fastcgi_param AREACODE            $ip2location_areacode;
+            fastcgi_param WEATHERSTATIONCODE  $ip2location_weatherstationcode;
+            fastcgi_param WEATHERSTATIONNAME  $ip2location_weatherstationname;
+            fastcgi_param MCC                 $ip2location_mcc;
+            fastcgi_param MNC                 $ip2location_mnc;
+            fastcgi_param ELEVATION           $ip2location_elevation;
+            fastcgi_param USAGETYPE           $ip2location_usagetype;
+        }
+
+        # redirect all ip address from UK to http://www.google.co.uk
+        if ($ip2location_country_short ~ ^UK$) {
+            rewrite ^(.*)$ http://www.google.co.uk last;
+        }
+    }
+}
+
