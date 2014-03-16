@@ -467,7 +467,7 @@ ngx_http_ip2location_create_ctx(ngx_http_request_t *r)
     imcf = ngx_http_get_module_main_conf(r, ngx_http_ip2location_module);
 
     size = ngx_sock_ntop(r->connection->sockaddr, address, NGX_INET6_ADDRSTRLEN, 0);
-    address[size + 1] = '\0';
+    address[size] = '\0';
 
     ctx->record = IP2Location_get_all(imcf->database, (char *)address);
 
