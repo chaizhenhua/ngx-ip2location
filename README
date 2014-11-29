@@ -8,7 +8,7 @@ Requirements
 ------------
 1.
 
-1. IP2Location C API library ( download from http://www.ip2location.com/developers/c )
+1. IP2Location C API library ( download from http://www.ip2location.com/developers/c.aspx )
 
 2. Nginx (version > 0.5)
 
@@ -24,10 +24,9 @@ $ sudo apt-get install build-essential zlib1g-dev libpcre3 libpcre3-dev libtool
 
 2. Download & Install IP2Location
 
-$ wget http://www.ip2location.com/downloads/ip2location-c-VERSION.tar.gz
-$ tar xvfz ip2location-c-VERSION.tar.gz
-$ cd ip2location-c-VERSION
-$ autoreconf -i -v --force
+$ wget http://www.ip2location.com/downloads/ip2location-c-6.0.3.tar.gz
+$ tar xvfz ip2location-c-6.0.3.tar.gz
+$ cd ip2location-c-6.0.3
 $ ./configure
 $ make
 $ sudo make install

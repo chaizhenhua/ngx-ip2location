@@ -4,10 +4,10 @@
  * AUTHOR: chaizhenhua@gmail.com
  */
 
+#include <nginx.h>
 #include <ngx_http.h>
 #include <float.h>
 
-#include "imath.h"
 #include "IP2Location.h"
 
 #define FLOAT_STRING_MAX_LEN (DBL_MAX_10_EXP + 2)
@@ -465,8 +465,11 @@ ngx_http_ip2location_create_ctx(ngx_http_request_t *r)
     ngx_http_set_ctx(r, ctx, ngx_http_ip2location_module);
 
     imcf = ngx_http_get_module_main_conf(r, ngx_http_ip2location_module);
-
+#if defined(nginx_version) && (nginx_version) >= 1005003
+    size = ngx_sock_ntop(r->connection->sockaddr, r->connection->socklen, address, NGX_INET6_ADDRSTRLEN, 0);
+#else
     size = ngx_sock_ntop(r->connection->sockaddr, address, NGX_INET6_ADDRSTRLEN, 0);
+#endif
     address[size] = '\0';
 
     ctx->record = IP2Location_get_all(imcf->database, (char *)address);
