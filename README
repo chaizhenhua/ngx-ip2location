@@ -25,8 +25,8 @@ $ sudo apt-get install build-essential zlib1g-dev libpcre3 libpcre3-dev libtool
 2. Download & Install IP2Location
 
 $ wget http://www.ip2location.com/downloads/ip2location-c-6.0.3.tar.gz
-$ tar xvfz ip2location-c-6.0.3.tar.gz
-$ cd ip2location-c-6.0.3
+$ tar xvfz ip2location-c-7.0.0.tar.gz
+$ cd ip2location-c-7.0.0
 $ ./configure
 $ make
 $ sudo make install
