@@ -571,7 +571,7 @@ ngx_http_ip2location_get_str_value(ngx_http_request_t *r,
 
     if (ngx_strcmp(v->data, NOT_SUPPORTED) == 0
             || ngx_strcmp(v->data, INVALID_IPV4_ADDRESS) == 0 
-            || ngx_strcmp(v->data, INVALID_IPV4_ADDRESS) == 0) {
+            || ngx_strcmp(v->data, INVALID_IPV6_ADDRESS) == 0) {
 
         v->not_found = 1;
         return NGX_OK;
@@ -618,7 +618,7 @@ ngx_http_ip2location_get_float_value(ngx_http_request_t *r,
         return NGX_ERROR;
     }
 
-    v->len = ngx_snprintf((u_char*)v->data, FLOAT_STRING_MAX_LEN, "%f", value)
+    v->len = ngx_snprintf((u_char*)v->data, FLOAT_STRING_MAX_LEN, "%.6f", value)
              - v->data;
 
     return NGX_OK;
