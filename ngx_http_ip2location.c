@@ -36,6 +36,8 @@ typedef struct {
     u_char                          *database_file;
     ngx_uint_t                       database_line;
     IP2Location                     *database;
+    ngx_array_t                     *proxies;
+    ngx_flag_t                      proxy_recursive;
 } ngx_http_ip2location_main_conf_t;
 
 static void *
@@ -69,6 +71,12 @@ ngx_http_ip2location_access_type(ngx_conf_t *cf, void *data, void *conf);
 
 static char *
 ngx_http_ip2location_enable(ngx_conf_t *cf, void *data, void *conf);
+
+static char *
+ngx_http_ip2location_proxy(ngx_conf_t *cf, ngx_command_t *cmd, void *conf);
+
+static ngx_int_t
+ngx_http_ip2location_cidr_value(ngx_conf_t *cf, ngx_str_t *net, ngx_cidr_t *cidr);
 
 
 static ngx_conf_post_t ngx_http_ip2location_post_database =
@@ -106,6 +114,22 @@ static ngx_command_t  ngx_http_ip2location_commands[] = {
         NGX_HTTP_MAIN_CONF_OFFSET,
         offsetof(ngx_http_ip2location_main_conf_t, access_type_name),
         &ngx_http_ip2location_post_access_type
+    },
+
+    {   ngx_string("ip2location_proxy"),
+        NGX_HTTP_MAIN_CONF|NGX_CONF_TAKE1,
+        ngx_http_ip2location_proxy,
+        NGX_HTTP_MAIN_CONF_OFFSET,
+        0,
+        NULL
+    },
+
+    {   ngx_string("ip2location_proxy_recursive"),
+        NGX_HTTP_MAIN_CONF|NGX_CONF_FLAG,
+        ngx_conf_set_flag_slot,
+        NGX_HTTP_MAIN_CONF_OFFSET,
+        offsetof(ngx_http_ip2location_main_conf_t, proxy_recursive),
+        NULL
     },
 
     ngx_null_command
@@ -444,9 +468,11 @@ ngx_http_ip2location_database(ngx_conf_t *cf, void *data, void *conf)
 static ngx_http_ip2location_ctx_t *
 ngx_http_ip2location_create_ctx(ngx_http_request_t *r)
 {
+    ngx_array_t                *xfwd;
     ngx_http_ip2location_ctx_t *ctx;
     ngx_pool_cleanup_t         *cln;
     ngx_http_ip2location_main_conf_t  *imcf;
+    ngx_addr_t                  addr;
     u_char                      address[NGX_INET6_ADDRSTRLEN + 1];
     size_t                      size;
 
@@ -465,10 +491,19 @@ ngx_http_ip2location_create_ctx(ngx_http_request_t *r)
     ngx_http_set_ctx(r, ctx, ngx_http_ip2location_module);
 
     imcf = ngx_http_get_module_main_conf(r, ngx_http_ip2location_module);
+    addr.sockaddr = r->connection->sockaddr;
+    addr.socklen = r->connection->socklen;
+
+    xfwd = &r->headers_in.x_forwarded_for;
+
+    if (xfwd->nelts > 0 && imcf->proxies != NULL) {
+        (void) ngx_http_get_forwarded_addr(r, &addr, xfwd, NULL, imcf->proxies, imcf->proxy_recursive);
+    }
+
 #if defined(nginx_version) && (nginx_version) >= 1005003
-    size = ngx_sock_ntop(r->connection->sockaddr, r->connection->socklen, address, NGX_INET6_ADDRSTRLEN, 0);
+    size = ngx_sock_ntop(addr.sockaddr, addr.socklen, address, NGX_INET6_ADDRSTRLEN, 0);
 #else
-    size = ngx_sock_ntop(r->connection->sockaddr, address, NGX_INET6_ADDRSTRLEN, 0);
+    size = ngx_sock_ntop(addr.sockaddr, address, NGX_INET6_ADDRSTRLEN, 0);
 #endif
     address[size] = '\0';
 
@@ -644,3 +679,62 @@ ngx_http_ip2location_add_variables(ngx_conf_t *cf)
 }
 
 
+static char *
+ngx_http_ip2location_proxy(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
+{
+    ngx_http_ip2location_main_conf_t  *imcf = conf;
+    ngx_str_t                         *value;
+    ngx_cidr_t                        cidr, *c;
+
+    value = cf->args->elts;
+
+    if (ngx_http_ip2location_cidr_value(cf, &value[1], &cidr) != NGX_OK) {
+        return NGX_CONF_ERROR;
+    }
+
+    if (imcf->proxies == NULL) {
+        imcf->proxies = ngx_array_create(cf->pool, 4, sizeof(ngx_cidr_t));
+        if (imcf->proxies == NULL) {
+            return NGX_CONF_ERROR;
+        }
+    }
+
+    c = ngx_array_push(imcf->proxies);
+    if (c == NULL) {
+        return NGX_CONF_ERROR;
+    }
+
+    *c = cidr;
+
+    return NGX_CONF_OK;
+}
+
+
+static ngx_int_t
+ngx_http_ip2location_cidr_value(ngx_conf_t *cf, ngx_str_t *net, ngx_cidr_t *cidr)
+{
+    ngx_int_t  rc;
+
+    if (ngx_strcmp(net->data, "255.255.255.255") == 0) {
+        cidr->family = AF_INET;
+        cidr->u.in.addr = 0xffffffff;
+        cidr->u.in.mask = 0xffffffff;
+
+        return NGX_OK;
+    }
+
+    rc = ngx_ptocidr(net, cidr);
+
+    if (rc == NGX_ERROR) {
+        ngx_conf_log_error(NGX_LOG_EMERG, cf, 0,
+                           "invalid network \"%V\"", net);
+        return NGX_ERROR;
+    }
+
+    if (rc == NGX_DONE) {
+        ngx_conf_log_error(NGX_LOG_WARN, cf, 0,
+                           "low address bits of %V are meaningless", net);
+    }
+
+    return NGX_OK;
+}
