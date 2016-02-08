@@ -58,6 +58,16 @@ Default: shared_memory
 Context: http
 Description: specifies to where the iplocation DB file will be loaded.
 
+Syntax:  ip2location_proxy cidr|address
+Default: none
+Context: http
+Description: sets a list of proxies to translate x-forwarded-for headers for
+
+Syntax:  ip2location_proxy_recursive on|off
+Default: off
+Context: http
+Description: enables recursive search in the x-forwarded-for address list
+
 
 Variables
 ---------
