@@ -35,25 +35,25 @@ http {
             fastcgi_param SCRIPT_FILENAME $document_root/$fastcgi_script_name;
 
             # pass ip2location variable to PHP
-            fastcgi_param COUNTRY_SHORT       $ip2location_country_short;
-            fastcgi_param COUNTRY_LONG        $ip2location_country_long;
-            fastcgi_param REGION              $ip2location_region;
-            fastcgi_param CITY                $ip2location_city;
-            fastcgi_param ISP                 $ip2location_isp;
-            fastcgi_param LATITUDE            $ip2location_latitude;
-            fastcgi_param ISP                 $ip2location_longitude;
-            fastcgi_param DOMAIN              $ip2location_domain;
-            fastcgi_param ZIPCODE             $ip2location_zipcode;
-            fastcgi_param TIMEZONE            $ip2location_timezone;
-            fastcgi_param NETSPEED            $ip2location_netspeed;
-            fastcgi_param IDDCODE             $ip2location_iddcode;
-            fastcgi_param AREACODE            $ip2location_areacode;
-            fastcgi_param WEATHERSTATIONCODE  $ip2location_weatherstationcode;
-            fastcgi_param WEATHERSTATIONNAME  $ip2location_weatherstationname;
-            fastcgi_param MCC                 $ip2location_mcc;
-            fastcgi_param MNC                 $ip2location_mnc;
-            fastcgi_param ELEVATION           $ip2location_elevation;
-            fastcgi_param USAGETYPE           $ip2location_usagetype;
+            fastcgi_param IP2LOCATION_COUNTRY_SHORT       $ip2location_country_short;
+            fastcgi_param IP2LOCATION_COUNTRY_LONG        $ip2location_country_long;
+            fastcgi_param IP2LOCATION_REGION              $ip2location_region;
+            fastcgi_param IP2LOCATION_CITY                $ip2location_city;
+            fastcgi_param IP2LOCATION_ISP                 $ip2location_isp;
+            fastcgi_param IP2LOCATION_LATITUDE            $ip2location_latitude;
+            fastcgi_param IP2LOCATION_ISP                 $ip2location_longitude;
+            fastcgi_param IP2LOCATION_DOMAIN              $ip2location_domain;
+            fastcgi_param IP2LOCATION_ZIPCODE             $ip2location_zipcode;
+            fastcgi_param IP2LOCATION_TIMEZONE            $ip2location_timezone;
+            fastcgi_param IP2LOCATION_NETSPEED            $ip2location_netspeed;
+            fastcgi_param IP2LOCATION_IDDCODE             $ip2location_iddcode;
+            fastcgi_param IP2LOCATION_AREACODE            $ip2location_areacode;
+            fastcgi_param IP2LOCATION_WEATHERSTATIONCODE  $ip2location_weatherstationcode;
+            fastcgi_param IP2LOCATION_WEATHERSTATIONNAME  $ip2location_weatherstationname;
+            fastcgi_param IP2LOCATION_MCC                 $ip2location_mcc;
+            fastcgi_param IP2LOCATION_MNC                 $ip2location_mnc;
+            fastcgi_param IP2LOCATION_ELEVATION           $ip2location_elevation;
+            fastcgi_param IP2LOCATION_USAGETYPE           $ip2location_usagetype;
         }
 
         # redirect all ip address from UK to http://www.google.co.uk
