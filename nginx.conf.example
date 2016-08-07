@@ -41,7 +41,7 @@ http {
             fastcgi_param IP2LOCATION_CITY                $ip2location_city;
             fastcgi_param IP2LOCATION_ISP                 $ip2location_isp;
             fastcgi_param IP2LOCATION_LATITUDE            $ip2location_latitude;
-            fastcgi_param IP2LOCATION_ISP                 $ip2location_longitude;
+            fastcgi_param IP2LOCATION_LONGITUDE           $ip2location_longitude;
             fastcgi_param IP2LOCATION_DOMAIN              $ip2location_domain;
             fastcgi_param IP2LOCATION_ZIPCODE             $ip2location_zipcode;
             fastcgi_param IP2LOCATION_TIMEZONE            $ip2location_timezone;
