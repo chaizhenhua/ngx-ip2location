@@ -6,9 +6,7 @@ This is a IP2Location Nginx Module that enables the user to identify the country
 
 Requirements
 ------------
-1.
-
-1. IP2Location C API library ( download from http://www.ip2location.com/developers/c.aspx )
+1. IP2Location C API library ( from http://www.ip2location.com/developers/c )
 
 2. Nginx (version > 0.5)
 
@@ -17,16 +15,16 @@ Installation
 1. Install dependencies:
 
 # These are for RedHat, CentOS, and Fedora.
-$ sudo yum install gcc-c++ pcre-dev pcre-devel zlib-devel make libtool
+$ sudo yum install wget git gcc-c++ pcre-devel zlib-devel make libtool autoconf automake
 
 # These are for Debian. Ubuntu will be similar.
-$ sudo apt-get install build-essential zlib1g-dev libpcre3 libpcre3-dev libtool
+$ sudo apt-get install wget git build-essential zlib1g-dev libpcre3 libpcre3-dev libtool autoconf automake
 
 2. Download & Install IP2Location
 
-$ wget http://www.ip2location.com/downloads/ip2location-c-7.0.0.tar.gz
-$ tar xvfz ip2location-c-7.0.0.tar.gz
-$ cd ip2location-c-7.0.0
+$ git clone https://github.com/chrislim2888/IP2Location-C-Library
+$ cd IP2Location-C-Library
+$ autoreconf -i -v --force
 $ ./configure
 $ make
 $ sudo make install
@@ -95,4 +93,28 @@ Config Example
 --------------
 nginx.conf.example
 
+Testing (test.php)
+------------------
+Output for "8.8.8.8" with "ngx_http_realip_module" and "IP2Location DB24 Sample":
+
+COUNTRY_SHORT => "US"
+COUNTRY_LONG => "United States"
+REGION => "California"
+CITY => "Mountain View"
+ISP => "Google Inc."
+LATITUDE => "37.405991"
+LONGITUDE => "-122.078514"
+DOMAIN => "google.com"
+ZIPCODE => "94043"
+TIMEZONE => "-07:00"
+NETSPEED => "T1"
+IDDCODE => "1"
+AREACODE => "650"
+WEATHERSTATIONCODE => "USCA0746"
+WEATHERSTATIONNAME => "Mountain View"
+MCC => "-"
+MNC => "-"
+MOBILEBRAND => "N/A"
+ELEVATION => "31.000000"
+USAGETYPE => "SES"
 
