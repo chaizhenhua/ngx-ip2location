@@ -468,7 +468,11 @@ ngx_http_ip2location_database(ngx_conf_t *cf, void *data, void *conf)
 static ngx_http_ip2location_ctx_t *
 ngx_http_ip2location_create_ctx(ngx_http_request_t *r)
 {
-    ngx_array_t                *xfwd;
+#if defined(nginx_version) && nginx_version >= 1023000
+    ngx_table_elt_t         *xfwd;
+#else
+    ngx_array_t             *xfwd;
+#endif
     ngx_http_ip2location_ctx_t *ctx;
     ngx_pool_cleanup_t         *cln;
     ngx_http_ip2location_main_conf_t  *imcf;
@@ -494,12 +498,17 @@ ngx_http_ip2location_create_ctx(ngx_http_request_t *r)
     addr.sockaddr = r->connection->sockaddr;
     addr.socklen = r->connection->socklen;
 
+#if defined(nginx_version) && nginx_version >= 1023000
+    xfwd = r->headers_in.x_forwarded_for;
+
+    if (xfwd != NULL && imcf->proxies != NULL) {
+#else
     xfwd = &r->headers_in.x_forwarded_for;
 
     if (xfwd->nelts > 0 && imcf->proxies != NULL) {
+#endif
         (void) ngx_http_get_forwarded_addr(r, &addr, xfwd, NULL, imcf->proxies, imcf->proxy_recursive);
     }
-
 #if defined(nginx_version) && (nginx_version) >= 1005003
     size = ngx_sock_ntop(addr.sockaddr, addr.socklen, address, NGX_INET6_ADDRSTRLEN, 0);
 #else
